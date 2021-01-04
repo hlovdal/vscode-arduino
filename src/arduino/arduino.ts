@@ -498,18 +498,18 @@ export class ArduinoApp {
     /**
      * Private implementation. Not to be called directly. The wrapper build()
      * manages the build state.
-     * @param mode See build()
+     * @param buildMode See build()
      * @param buildDir See build()
      * @see https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc
      */
-    private async _build(mode: BuildMode, buildDir?: string): Promise<boolean> {
+    private async _build(buildMode: BuildMode, buildDir?: string): Promise<boolean> {
         const dc = DeviceContext.getInstance();
         const args: string[] = [];
         let restoreSerialMonitor: boolean = false;
         const verbose = VscodeSettings.getInstance().logLevel === constants.LogLevel.Verbose;
 
         if (!this.boardManager.currentBoard) {
-            if (mode !== BuildMode.Analyze) {
+            if (buildMode !== BuildMode.Analyze) {
                 logger.notifyUserError("boardManager.currentBoard", new Error(constants.messages.NO_BOARD_SELECTED));
             }
             return false;
@@ -524,7 +524,7 @@ export class ArduinoApp {
         }
 
         if (!dc.sketch || !util.fileExistsSync(path.join(ArduinoWorkspace.rootPath, dc.sketch))) {
-            if (mode === BuildMode.Analyze) {
+            if (buildMode === BuildMode.Analyze) {
                 // Analyze runs non interactively
                 return false;
             }
@@ -543,7 +543,7 @@ export class ArduinoApp {
             }
         }
 
-        if (mode === BuildMode.Upload) {
+        if (buildMode === BuildMode.Upload) {
             if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
                 await selectSerial();
                 return false;
@@ -555,7 +555,7 @@ export class ArduinoApp {
                 args.push("--port", dc.port);
             }
 
-        } else if (mode === BuildMode.CliUpload) {
+        } else if (buildMode === BuildMode.CliUpload) {
             if ((!dc.configuration || !/upload_method=[^=,]*st[^,]*link/i.test(dc.configuration)) && !dc.port) {
                 await selectSerial();
                 return false;
@@ -571,7 +571,7 @@ export class ArduinoApp {
             if (dc.port) {
                 args.push("--port", dc.port);
             }
-        } else if (mode === BuildMode.UploadProgrammer) {
+        } else if (buildMode === BuildMode.UploadProgrammer) {
             const programmer = this.programmerManager.currentProgrammer;
             if (!programmer) {
                 logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
@@ -591,7 +591,7 @@ export class ArduinoApp {
 
             args.push("--port", dc.port);
 
-        } else if (mode === BuildMode.CliUploadProgrammer) {
+        } else if (buildMode === BuildMode.CliUploadProgrammer) {
             const programmer = this.programmerManager.currentProgrammer;
             if (!programmer) {
                 logger.notifyUserError("getProgrammerString", new Error(constants.messages.NO_PROGRAMMMER_SELECTED));
@@ -638,7 +638,7 @@ export class ArduinoApp {
         // we prepare the channel here since all following code will
         // or at leas can possibly output to it
         arduinoChannel.show();
-        arduinoChannel.start(`${mode} sketch '${dc.sketch}'`);
+        arduinoChannel.start(`${buildMode} sketch '${dc.sketch}'`);
 
         if (buildDir || dc.output) {
             // 2020-02-29, EW: This whole code appears a bit wonky to me.
@@ -658,7 +658,7 @@ export class ArduinoApp {
 
         // Environment variables passed to pre- and post-build commands
         const env = {
-            VSCA_BUILD_MODE: mode,
+            VSCA_BUILD_MODE: buildMode,
             VSCA_SKETCH: dc.sketch,
             VSCA_BOARD: boardDescriptor,
             VSCA_WORKSPACE_DIR: ArduinoWorkspace.rootPath,
@@ -680,10 +680,10 @@ export class ArduinoApp {
 
         // stop serial monitor when everything is prepared and good
         // what makes restoring of its previous state easier
-        if (mode === BuildMode.Upload ||
-            mode === BuildMode.UploadProgrammer ||
-            mode === BuildMode.CliUpload ||
-            mode === BuildMode.CliUploadProgrammer) {
+        if (buildMode === BuildMode.Upload ||
+            buildMode === BuildMode.UploadProgrammer ||
+            buildMode === BuildMode.CliUpload ||
+            buildMode === BuildMode.CliUploadProgrammer) {
             restoreSerialMonitor = await SerialMonitor.getInstance().closeSerialMonitor(dc.port);
             UsbDetector.getInstance().pauseListening();
         }
@@ -699,7 +699,7 @@ export class ArduinoApp {
                 ret = await this.runPrePostBuildCommand(dc, env, "post");
             }
             await cocopa.conclude();
-            if (mode === BuildMode.Upload || mode === BuildMode.UploadProgrammer) {
+            if (buildMode === BuildMode.Upload || buildMode === BuildMode.UploadProgrammer) {
                 UsbDetector.getInstance().resumeListening();
                 if (restoreSerialMonitor) {
                     await SerialMonitor.getInstance().openSerialMonitor();
@@ -750,7 +750,7 @@ export class ArduinoApp {
         ).then(async () => {
             const ret = await cleanup("ok");
             if (ret) {
-                arduinoChannel.end(`${mode} sketch '${dc.sketch}'${os.EOL}`);
+                arduinoChannel.end(`${buildMode} sketch '${dc.sketch}'${os.EOL}`);
             }
             return ret;
         }, async (reason) => {
@@ -758,7 +758,7 @@ export class ArduinoApp {
             const msg = reason.code
                 ? `Exit with code=${reason.code}`
                 : JSON.stringify(reason);
-            arduinoChannel.error(`${mode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
+            arduinoChannel.error(`${buildMode} sketch '${dc.sketch}': ${msg}${os.EOL}`);
             return false;
         });
     }
