@@ -253,10 +253,12 @@ export class ArduinoApp {
         try {
             this._settings.useArduinoCli ?
                 await util.spawn(this._settings.commandPath,
-                    ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`], undefined,
+                    ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`],
+                    undefined,
                     { channel: showOutput ? arduinoChannel.channel : null }) :
                 await util.spawn(this._settings.commandPath,
-                    ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`], undefined,
+                    ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`],
+                    undefined,
                     { channel: showOutput ? arduinoChannel.channel : null });
 
             if (updatingIndex) {
