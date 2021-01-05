@@ -302,15 +302,17 @@ export class ArduinoApp {
             arduinoChannel.start(`Install library - ${libName}`);
         }
         try {
-            this.useArduinoCli() ?
-            await  util.spawn(this._settings.commandPath,
-                ["lib", "install", `${libName}${version && "@" + version}`],
-                undefined,
-                { channel: showOutput ? arduinoChannel.channel : undefined }) :
-            await util.spawn(this._settings.commandPath,
-                             ["--install-library", `${libName}${version && ":" + version}`],
-                             undefined,
-                             { channel: showOutput ? arduinoChannel.channel : undefined });
+            if (this.useArduinoCli()) {
+                await  util.spawn(this._settings.commandPath,
+                    ["lib", "install", `${libName}${version && "@" + version}`],
+                    undefined,
+                    { channel: showOutput ? arduinoChannel.channel : undefined });
+            } else {
+                await util.spawn(this._settings.commandPath,
+                    ["--install-library", `${libName}${version && ":" + version}`],
+                    undefined,
+                    { channel: showOutput ? arduinoChannel.channel : undefined });
+            }
             if (updatingIndex) {
                 arduinoChannel.end("Updated library index files.");
             } else {
