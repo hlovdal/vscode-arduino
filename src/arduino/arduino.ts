@@ -655,7 +655,11 @@ export class ArduinoApp {
                 logger.notifyUserError("InvalidOutPutPath", new Error(constants.messages.INVALID_OUTPUT_PATH + buildDir));
                 return false;
             }
-            this._settings.useArduinoCli ? args.push ("--build-path", buildDir) : args.push("--pref", `build.path=${buildDir}`);
+            if (this._settings.useArduinoCli) {
+                args.push("--build-path", buildDir);
+             } else {
+                 args.push("--pref", `build.path=${buildDir}`);
+             }
             arduinoChannel.info(`Please see the build logs in output path: ${buildDir}`);
         } else {
             const msg = "Output path is not specified. Unable to reuse previously compiled files. Build will be slower. See README.";
