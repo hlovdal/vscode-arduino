@@ -522,7 +522,11 @@ export class ArduinoApp {
         }
         const boardDescriptor = this.boardManager.currentBoard.getBuildConfig();
 
-        this._settings.useArduinoCli ? args.push("-b", boardDescriptor) : args.push("--board", boardDescriptor);
+        if (this._settings.useArduinoCli) {
+            args.push("-b", boardDescriptor);
+        } else {
+            args.push("--board", boardDescriptor);
+        }
 
         if (!ArduinoWorkspace.rootPath) {
             vscode.window.showWarningMessage("Workspace doesn't seem to have a folder added to it yet.");
