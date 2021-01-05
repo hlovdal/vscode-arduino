@@ -150,7 +150,7 @@ export class ArduinoApp {
     /**
      * Runs the arduino builder to build/compile and - if necessary - upload
      * the current sketch.
-     * @param mode Build mode.
+     * @param buildMode Build mode.
      *  * BuildMode.Upload: Compile and upload
      *  * BuildMode.UploadProgrammer: Compile and upload using the user
      *     selectable programmer
@@ -168,7 +168,7 @@ export class ArduinoApp {
      *  * board- or programmer-manager aren't initialized yet
      *  * or something went wrong during the build
      */
-    public async build(mode: BuildMode, buildDir?: string) {
+    public async build(buildMode: BuildMode, buildDir?: string) {
 
         if (!this._boardManager || !this._programmerManager || this._building) {
             return false;
@@ -176,7 +176,7 @@ export class ArduinoApp {
 
         this._building = true;
 
-        return await this._build(mode, buildDir)
+        return await this._build(buildMode, buildDir)
         .then((ret) => {
             this._building = false;
             return ret;
@@ -185,7 +185,7 @@ export class ArduinoApp {
             this._building = false;
             logger.notifyUserError("ArduinoApp.build",
                                    reason,
-                                   `Unhandled exception when cleaning up build "${mode}": ${JSON.stringify(reason)}`);
+                                   `Unhandled exception when cleaning up build "${buildMode}": ${JSON.stringify(reason)}`);
             return false;
         });
     }
