@@ -636,7 +636,11 @@ export class ArduinoApp {
         this._settings.useArduinoCli ? args.push("--verbose") : args.push("--verbose-build");
 
         if (verbose) {
-            this._settings.useArduinoCli ? args.push ("--verbose") : args.push("--verbose-upload");
+            if (this._settings.useArduinoCli) {
+                args.push("--verbose")
+            } else {
+                args.push("--verbose-upload");
+            }
         }
 
         await vscode.workspace.saveAll(false);
