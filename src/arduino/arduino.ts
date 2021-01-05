@@ -251,15 +251,17 @@ export class ArduinoApp {
         }
         arduinoChannel.info(`${packageName}${arch && ":" + arch}${version && ":" + version}`);
         try {
-            this._settings.useArduinoCli ?
+            if (this._settings.useArduinoCli) {
                 await util.spawn(this._settings.commandPath,
                     ["core", "install", `${packageName}${arch && ":" + arch}${version && "@" + version}`],
                     undefined,
-                    { channel: showOutput ? arduinoChannel.channel : null }) :
+                    { channel: showOutput ? arduinoChannel.channel : null });
+            } else {
                 await util.spawn(this._settings.commandPath,
                     ["--install-boards", `${packageName}${arch && ":" + arch}${version && ":" + version}`],
                     undefined,
                     { channel: showOutput ? arduinoChannel.channel : null });
+            }
 
             if (updatingIndex) {
                 arduinoChannel.end("Updated package index files.");
