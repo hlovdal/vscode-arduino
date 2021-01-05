@@ -585,13 +585,15 @@ export class ArduinoApp {
                 await selectSerial();
                 return false;
             }
-            this._settings.useArduinoCli ?
+            if (this._settings.useArduinoCli) {
                 args.push("compile",
                             "--upload",
-                            "--porgrammer", programmer) :
+                            "--porgrammer", programmer);
+            } else {
                 args.push("--upload",
                         "--useprogrammer",
                         "--pref", `programmer=${programmer}`);
+            }
 
             args.push("--port", dc.port);
 
