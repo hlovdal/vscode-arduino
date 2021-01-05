@@ -559,7 +559,11 @@ export class ArduinoApp {
                 return false;
             }
 
-            this._settings.useArduinoCli ? args.push("compile", "--upload") : args.push("--upload");
+            if (this._settings.useArduinoCli) {
+                args.push("compile", "--upload");
+            } else {
+                args.push("--upload");
+            }
 
             if (dc.port) {
                 args.push("--port", dc.port);
