@@ -629,7 +629,11 @@ export class ArduinoApp {
                         "--port", dc.port);
 
         } else {
-            this._settings.useArduinoCli ? args.unshift("compile") : args.push("--verify");
+            if (this._settings.useArduinoCli) {
+                args.unshift("compile");
+            } else {
+                args.push("--verify");
+            }
         }
 
         // TODO: Option to add prefrences when using the CLI
