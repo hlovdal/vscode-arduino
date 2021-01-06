@@ -647,7 +647,11 @@ export class ArduinoApp {
 
         // We always build verbosely but filter the output based on the settings
 
-        this._settings.useArduinoCli ? args.push("--verbose") : args.push("--verbose-build");
+        if (this._settings.useArduinoCli) {
+            args.push("--verbose");
+        } else {
+            args.push("--verbose-build");
+        }
 
         if (verbose) {
             if (this._settings.useArduinoCli) {
